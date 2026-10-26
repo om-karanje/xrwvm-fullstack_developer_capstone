@@ -63,7 +63,21 @@ def logout_request(request):
 
 
 # Get dealerships placeholder
-# Implement get_dealerships when required.
+def get_dealerships(request):
+    dealerships_file = os.path.join(
+        settings.BASE_DIR, "database", "data", "dealerships.json"
+    )
+
+    try:
+        with open(dealerships_file, "r", encoding="utf-8") as file:
+            data = json.load(file)
+    except (OSError, json.JSONDecodeError):
+        logger.exception("Could not load dealerships")
+        return JsonResponse(
+            {"error": "Could not load dealerships"}, status=500
+        )
+
+    return JsonResponse(data)
 
 
 # Get reviews for a dealer
