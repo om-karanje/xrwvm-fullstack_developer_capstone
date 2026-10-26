@@ -108,7 +108,25 @@ def get_dealer_reviews(request, dealer_id):
 
 
 # Get dealer details placeholder
-# Implement get_dealer_details when required.
+def get_dealer_details(request, dealer_id):
+    dealerships_file = os.path.join(
+        settings.BASE_DIR, "database", "data", "dealerships.json"
+    )
+
+    try:
+        with open(dealerships_file, "r", encoding="utf-8") as file:
+            data = json.load(file)
+    except (OSError, json.JSONDecodeError):
+        logger.exception("Could not load dealerships")
+        return JsonResponse(
+            {"error": "Could not load dealerships"}, status=500
+        )
+
+    for dealer in data.get("dealerships", []):
+        if dealer.get("id") == dealer_id:
+            return JsonResponse(dealer)
+
+    return JsonResponse({"error": "Dealer not found"}, status=404)
 
 
 # Add a review placeholder
