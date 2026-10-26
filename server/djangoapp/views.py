@@ -79,6 +79,37 @@ def get_dealerships(request):
 
     return JsonResponse(data)
 
+def get_car_make(request):
+    cars_file = os.path.join(
+        settings.BASE_DIR, "database", "data", "car_records.json"
+    )
+
+    try:
+        with open(cars_file, "r", encoding="utf-8") as file:
+            data = json.load(file)
+    except (OSError, json.JSONDecodeError):
+        logger.exception("Could not load car records")
+        return JsonResponse(
+            {"error": "Could not load car records"}, status=500
+        )
+
+    car_makes = sorted({
+        car.get("make")
+        for car in data.get("cars", [])
+        if car.get("make")
+    })
+
+    car_models = sorted({
+        car.get("model")
+        for car in data.get("cars", [])
+        if car.get("model")
+    })
+
+    return JsonResponse({
+        "car_makes": car_makes,
+        "car_models": car_models
+    })
+
 def get_dealers_by_state(request, state):
     dealerships_file = os.path.join(
         settings.BASE_DIR, "database", "data", "dealerships.json"
