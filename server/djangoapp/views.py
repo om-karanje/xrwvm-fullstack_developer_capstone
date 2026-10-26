@@ -79,6 +79,26 @@ def get_dealerships(request):
 
     return JsonResponse(data)
 
+def get_dealers_by_state(request, state):
+    dealerships_file = os.path.join(
+        settings.BASE_DIR, "database", "data", "dealerships.json"
+    )
+
+    try:
+        with open(dealerships_file, "r", encoding="utf-8") as file:
+            data = json.load(file)
+    except (OSError, json.JSONDecodeError):
+        logger.exception("Could not load dealerships")
+        return JsonResponse(
+            {"error": "Could not load dealerships"}, status=500
+        )
+
+    dealers = [
+        dealer for dealer in data.get("dealerships", [])
+        if dealer.get("state", "").lower() == state.lower()
+    ]
+
+    return JsonResponse({"dealerships": dealers})
 
 # Get reviews for a dealer
 def get_dealer_reviews(request, dealer_id):
