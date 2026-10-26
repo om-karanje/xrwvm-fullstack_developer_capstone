@@ -2,6 +2,8 @@
 import os
 import json
 import logging
+import requests
+from .restapis import analyze_review_sentiments
 
 from django.conf import settings
 from django.http import JsonResponse
@@ -57,6 +59,21 @@ def logout_request(request):
     logout(request)
     return JsonResponse({"status": "Logged out"})
 
+@csrf_exempt
+def analyze_review(request):
+    if request.method != "GET":
+        return JsonResponse({"error": "GET method required"}, status=405)
+
+    text = request.GET.get("text", "Fantastic services")
+
+    try:
+        result = analyze_review_sentiments(text)
+        return JsonResponse(result, safe=not isinstance(result, list))
+    except requests.RequestException:
+        logger.exception("Sentiment analysis request failed")
+        return JsonResponse(
+            {"error": "Sentiment analysis service unavailable"}, status=502
+        )
 
 # Registration placeholder
 # Implement registration when required.
