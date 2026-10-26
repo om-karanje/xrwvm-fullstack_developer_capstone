@@ -10,21 +10,24 @@ const Dealers = () => {
   let [states, setStates] = useState([])
 
   // let root_url = window.location.origin
-  let dealer_url ="/djangoapp/get_dealers";
-  
-  let dealer_url_by_state = "/djangoapp/get_dealers/";
+  let dealer_url = "/djangoapp/dealers";
+  let dealer_url_by_state = "/djangoapp/dealers/state/";
  
   const filterDealers = async (state) => {
-    dealer_url_by_state = dealer_url_by_state+state;
-    const res = await fetch(dealer_url_by_state, {
+    if (state === "All") {
+      get_dealers();
+      return;
+    }
+  
+    const res = await fetch(dealer_url_by_state + encodeURIComponent(state), {
       method: "GET"
     });
     const retobj = await res.json();
-    if(retobj.status === 200) {
-      let state_dealers = Array.from(retobj.dealers)
-      setDealersList(state_dealers)
+  
+    if (retobj.status === 200) {
+      setDealersList(Array.from(retobj.dealers));
     }
-  }
+ };
 
   const get_dealers = async ()=>{
     const res = await fetch(dealer_url, {
