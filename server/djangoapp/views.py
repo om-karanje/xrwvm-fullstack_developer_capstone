@@ -1,11 +1,13 @@
 
+import os
+import json
+import logging
+
+from django.conf import settings
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.csrf import csrf_exempt
-import logging
-import json
 
-# Get an instance of a logger
 logger = logging.getLogger(__name__)
 
 
@@ -56,27 +58,44 @@ def logout_request(request):
     return JsonResponse({"status": "Logged out"})
 
 
-# Registration view - implement when required
-# @csrf_exempt
-# def registration(request):
-#     pass
+# Registration placeholder
+# Implement registration when required.
 
 
-# Get dealerships
-# def get_dealerships(request):
-#     pass
+# Get dealerships placeholder
+# Implement get_dealerships when required.
 
 
 # Get reviews for a dealer
-# def get_dealer_reviews(request, dealer_id):
-#     pass
+def get_dealer_reviews(request, dealer_id):
+    reviews_file = os.path.join(
+        settings.BASE_DIR,
+        "database",
+        "data",
+        "reviews.json"
+    )
+
+    try:
+        with open(reviews_file, "r", encoding="utf-8") as file:
+            data = json.load(file)
+    except (OSError, json.JSONDecodeError):
+        logger.exception("Could not load dealer reviews")
+        return JsonResponse(
+            {"error": "Could not load reviews"},
+            status=500
+        )
+
+    reviews = [
+        review for review in data.get("reviews", [])
+        if review.get("dealership") == dealer_id
+    ]
+
+    return JsonResponse({"reviews": reviews})
 
 
-# Get dealer details
-# def get_dealer_details(request, dealer_id):
-#     pass
+# Get dealer details placeholder
+# Implement get_dealer_details when required.
 
 
-# Add a review
-# def add_review(request):
-#     pass
+# Add a review placeholder
+# Implement add_review when required.
